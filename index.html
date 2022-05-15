@@ -88,8 +88,8 @@
             }
         }
 
-        const timer = 130;
-        let letters = "ACDEFGHJKNPRSTVZ".split("")
+        const timer = 90;
+        let letters = "ACDEFGJKNPRSTZ".split("")
         let numbers = "123456789".split("")
 
         let prev = null;
@@ -107,7 +107,7 @@
             if (performance.now() >= targetTime) {
                 delay -= 1;
                 let result;
-                if (delay == 2) {
+                if (delay == 3) {
                     result = firstLetter
                     targetTime = performance.now() + timer;
                 } else if (delay == 0) {
