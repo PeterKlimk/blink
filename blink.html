@@ -1,0 +1,162 @@
+<html>
+
+<head>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            background: rgb(10, 10, 10);
+        }
+
+        #container {
+            user-select: none;
+            cursor: default;
+            color: rgb(194, 22, 22);
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        #instruct {
+            font-size: 32px;
+            text-align: center;
+        }
+
+        #display {
+            position: relative;
+            font-size: 26px;
+            color: rgb(129, 0, 0);
+        }
+
+        #picked {
+            height: 64px;
+            font-size: 64px;
+        }
+
+        #start {
+            font-family: monospace;
+            margin-top: 20px;
+            color: rgb(238, 238, 238);
+            background: none;
+            cursor: pointer;
+            border: none;
+            font-size: 64px;
+        }
+
+        #results {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="instruct">
+            <div>You will be shown two letters.</div>
+            <div>Remember both.</div>
+            <button id="start" onclick="start()">Start</button>
+        </div>
+        <div id="results" class="hidden">
+            <div id="letters">Got it?</div>
+        </div>
+        <div id="display" class="hidden">1</div>
+        <div id="picked"></div>
+    </div>
+
+    <script>
+        function randomElement(array, mask) {
+            while (true) {
+                let result = array[Math.floor(Math.random() * array.length)];
+                if (result != mask) {
+                    return result;
+                }
+            }
+        }
+
+        function removeElement(array, element) {
+            let index = array.indexOf(element);
+            if (index > -1) {
+                array.splice(index, 1);
+            }
+        }
+
+        const timer = 130;
+        let letters = "ACDEFGHJKNPRSTVZ".split("")
+        let numbers = "123456789".split("")
+
+        let prev = null;
+
+        let delay = 40 + Math.floor(Math.random() * 50);
+
+        let targetTime = 0;
+
+        let firstLetter = randomElement(letters, null);
+        let chosen = [firstLetter]
+        removeElement(letters, firstLetter);
+
+        function tick() {
+            let display = document.getElementById("display");
+            if (performance.now() >= targetTime) {
+                delay -= 1;
+                let result;
+                if (delay == 2) {
+                    result = firstLetter
+                    targetTime = performance.now() + timer;
+                } else if (delay == 0) {
+                    result = randomElement(letters, prev);
+                    chosen.push(result);
+                    targetTime = performance.now() + timer;
+                } else {
+                    result = randomElement(numbers, prev);
+                    targetTime = performance.now() + timer;
+                }
+                prev = result;
+                display.innerText = result;
+            }
+
+            if (delay >= -5) {
+                window.requestAnimationFrame(tick);
+            } else {
+                setTimeout(finish1, 500);
+            }
+        }
+
+
+        function finish1() {
+            document.getElementById("results").className = "";
+            document.getElementById("display").className = "hidden";
+            setTimeout(finish2, 2000);
+        }
+
+        function finish2() {
+            let other = randomElement(letters, chosen[1]);
+            console.log(chosen[1]);
+
+            if (Math.random() >= 0.5) {
+                chosen.push(other);
+            } else {
+                let temp = chosen.pop();
+                chosen.push(other)
+                chosen.push(temp);
+            }
+            document.getElementById("letters").innerText = `The letters were "${chosen[0]}", and "${chosen[1]}" or "${chosen[2]}"`;
+        }
+
+        function start() {
+            document.getElementById("instruct").className = "hidden";
+            document.getElementById("display").className = "";
+            window.requestAnimationFrame(tick);
+        }
+    </script>
+</body>
+
+</html>
